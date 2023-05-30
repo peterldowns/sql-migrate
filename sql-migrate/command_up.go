@@ -7,9 +7,10 @@ import (
 	migrate "github.com/rubenv/sql-migrate"
 )
 
-type UpCommand struct{}
+type UpCommand struct {
+}
 
-func (*UpCommand) Help() string {
+func (c *UpCommand) Help() string {
 	helpText := `
 Usage: sql-migrate up [options] ...
 
@@ -27,7 +28,7 @@ Options:
 	return strings.TrimSpace(helpText)
 }
 
-func (*UpCommand) Synopsis() string {
+func (c *UpCommand) Synopsis() string {
 	return "Migrates the database to the most recent version available"
 }
 

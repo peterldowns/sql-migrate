@@ -7,9 +7,10 @@ import (
 	migrate "github.com/rubenv/sql-migrate"
 )
 
-type DownCommand struct{}
+type DownCommand struct {
+}
 
-func (*DownCommand) Help() string {
+func (c *DownCommand) Help() string {
 	helpText := `
 Usage: sql-migrate down [options] ...
 
@@ -27,7 +28,7 @@ Options:
 	return strings.TrimSpace(helpText)
 }
 
-func (*DownCommand) Synopsis() string {
+func (c *DownCommand) Synopsis() string {
 	return "Undo a database migration"
 }
 

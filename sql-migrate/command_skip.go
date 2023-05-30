@@ -8,9 +8,10 @@ import (
 	migrate "github.com/rubenv/sql-migrate"
 )
 
-type SkipCommand struct{}
+type SkipCommand struct {
+}
 
-func (*SkipCommand) Help() string {
+func (c *SkipCommand) Help() string {
 	helpText := `
 Usage: sql-migrate skip [options] ...
 
@@ -26,12 +27,13 @@ Options:
 	return strings.TrimSpace(helpText)
 }
 
-func (*SkipCommand) Synopsis() string {
+func (c *SkipCommand) Synopsis() string {
 	return "Sets the database level to the most recent version available, without running the migrations"
 }
 
 func (c *SkipCommand) Run(args []string) int {
 	var limit int
+	var dryrun bool
 
 	cmdFlags := flag.NewFlagSet("up", flag.ContinueOnError)
 	cmdFlags.Usage = func() { ui.Output(c.Help()) }
@@ -42,7 +44,7 @@ func (c *SkipCommand) Run(args []string) int {
 		return 1
 	}
 
-	err := SkipMigrations(migrate.Up, limit)
+	err := SkipMigrations(migrate.Up, dryrun, limit)
 	if err != nil {
 		ui.Error(err.Error())
 		return 1
@@ -51,10 +53,10 @@ func (c *SkipCommand) Run(args []string) int {
 	return 0
 }
 
-func SkipMigrations(dir migrate.MigrationDirection, limit int) error {
+func SkipMigrations(dir migrate.MigrationDirection, dryrun bool, limit int) error {
 	env, err := GetEnvironment()
 	if err != nil {
-		return fmt.Errorf("Could not parse config: %w", err)
+		return fmt.Errorf("Could not parse config: %s", err)
 	}
 
 	db, dialect, err := GetConnection(env)
@@ -69,7 +71,7 @@ func SkipMigrations(dir migrate.MigrationDirection, limit int) error {
 
 	n, err := migrate.SkipMax(db, dialect, source, dir, limit)
 	if err != nil {
-		return fmt.Errorf("Migration failed: %w", err)
+		return fmt.Errorf("Migration failed: %s", err)
 	}
 
 	switch n {
